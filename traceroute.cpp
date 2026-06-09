@@ -4,6 +4,8 @@
 #include <fstream>
 #include <unordered_map>
 #include <unordered_set>
+#include <sstream>
+#include <vector>
 
 using namespace std;
 
@@ -11,7 +13,7 @@ int main(int argc, char*argv[]){
 
 //ABRIR O ARQUIVO
     if (argc < 2){
-        cerr << "O arquivo de log não foi fornecido." << endl;
+        cerr << "O arquivo de log nao foi fornecido." << endl;
         return 1;
     }
 
@@ -25,6 +27,8 @@ int main(int argc, char*argv[]){
 //LER O ARQUIVO
     graph::digraph g;
     unordered_set<string> seen_arestas; //arestas existentes, nao aceita duplicadas
+    int vert_unicos = 0;
+    int link_unicos = 0;
 
     string linha;
 
@@ -51,9 +55,11 @@ int main(int argc, char*argv[]){
             //CRIAR VÉRTICES
             if (g.find(hop_from) == nullptr){
                 g.insert_nodo(hop_from);
+                vert_unicos++;
             }
             if (g.find(hop_to) == nullptr){
                 g.insert_nodo(hop_to);
+                vert_unicos++;
             }
 
             //CRIAR LINKS
@@ -62,12 +68,18 @@ int main(int argc, char*argv[]){
             if (seen_arestas.find(aresta) == seen_arestas.end()){
                 g.insert_link(hop_from, hop_to);
                 seen_arestas.insert(aresta);
+                link_unicos++;
             }
-
-            //TESTE cout << hop_from << " -> " << hop_to << endl;    
-            
         }
     }
+
+    cout << "--------------"
+            <<"\nCarga de Dados inserida com sucesso!" 
+                << "\nNumero de Vertices Unicos = " << vert_unicos << " | Grafo: " << g.size()
+                    << "\nNumero de Links Unicos = " << link_unicos << "| Links grafo: " << seen_arestas.size()
+                        << "\n--------------";
+ 
+    //TESTE cout << hop_from << " -> " << hop_to << endl;    
 
     return 0;
 }
