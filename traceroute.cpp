@@ -22,9 +22,9 @@ int main(int argc, char*argv[]){
         return 1;
     } 
    
-
 //LER O ARQUIVO
     graph::digraph g;
+    unordered_set<string> seen_arestas; //arestas existentes, nao aceita duplicadas
 
     string linha;
 
@@ -45,21 +45,27 @@ int main(int argc, char*argv[]){
             if (hop_from == "hop_from") continue; //pula cabeçalho
 
             if (hop_to == "*" || hop_from.empty() || hop_to.empty()) {
-                continue; //ignora se estiver vazio
+                continue; //ignora se estiver vazio ou timeout
             }
 
-            //TESTE
-            cout << hop_from << " -> " << hop_to << endl;    
-            
-            //CRIAR GRAFO
-
+            //CRIAR VÉRTICES
             if (g.find(hop_from) == nullptr){
                 g.insert_nodo(hop_from);
             }
             if (g.find(hop_to) == nullptr){
                 g.insert_nodo(hop_to);
             }
-            g.insert_link(hop_from, hop_to);
+
+            //CRIAR LINKS
+            string aresta = hop_from + "->" + hop_to;
+
+            if (seen_arestas.find(aresta) == seen_arestas.end()){
+                g.insert_link(hop_from, hop_to);
+                seen_arestas.insert(aresta);
+            }
+
+            //TESTE cout << hop_from << " -> " << hop_to << endl;    
+            
         }
     }
 
