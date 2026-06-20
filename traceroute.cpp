@@ -2,12 +2,16 @@
 #include <iostream>
 #include <iomanip>
 #include <fstream>
-#include <unordered_map>
 #include <unordered_set>
+#include <algorithm>
 #include <sstream>
 #include <vector>
 
 using namespace std;
+
+bool comparaRoteadores(const pair<string, size_t>& a, const pair<string, size_t>& b) {
+    return a.second > b.second; //retorna true se o primeiro roteador tiver mais entradas que o segundo
+}
 
 int main(int argc, char*argv[]){
 
@@ -23,13 +27,12 @@ int main(int argc, char*argv[]){
         cerr << "Não foi possível abrir o arquivo para leitura." << endl;
         return 1;
     } 
-    
-
-//ifstream arq("input_1.log");
 
 //LER O ARQUIVO
     graph::digraph g;
     unordered_set<string> seen_arestas; //arestas existentes, nao aceita duplicadas
+    vector<string> ips; //lista de todos os ips
+
     int vert_unicos = 0;
     int link_unicos = 0;
 
@@ -59,10 +62,14 @@ int main(int argc, char*argv[]){
             if (g.find(hop_from) == nullptr){
                 g.insert_nodo(hop_from);
                 vert_unicos++;
+
+                ips.push_back(hop_from);
             }
             if (g.find(hop_to) == nullptr){
                 g.insert_nodo(hop_to);
                 vert_unicos++;
+
+                ips.push_back(hop_to);
             }
 
             //CRIAR LINKS
@@ -81,25 +88,33 @@ int main(int argc, char*argv[]){
                 << "\nNumero de Vertices Unicos (IPs) : " << vert_unicos     
                     << "\nNumero de Arestas Unicas (Rotas) : = " << link_unicos
                         << endl;
-
-    cout << "\n===== MENU ====="
-            << "\n1. Exibir grafo completo"
-                << "\n2. Encontrar menor caminho"
-                    << "\n3. Calcular diametro do grafo"
-                        << "\n4. Identificar roteadores criticos"
-                            << "\n0. Sair"
-                                << "\n==============" << endl;
  
+    //MENU PRINCIPAL         
+
     int op;
-    while (cin >> op){
+    while (true){
+        cout << "\n===== MENU ====="
+            << "\n1. Exibir grafo completo"
+            << "\n2. Encontrar menor caminho"
+            << "\n3. Calcular diametro do grafo"
+            << "\n4. Identificar roteadores criticos"
+            << "\n0. Sair"
+            << "\n==============" << endl;
+
+        if (!(cin >> op)){ //tratamento de erro de entrada
+            cin.clear();
+            cin.ignore(100, '\n');
+            cerr << "Erro! Tente novamente" << endl;
+            continue;
+        }
+
         if (op == 0){ cout << "Saindo..." << endl; break; }
             
         switch(op){
-            //EXIBIR GRAFO
-            case 1: {
+            case 1: { //EXIBIR GRAFO -- SUBMENU
                 int metodoSaida;
                 do {
-                    cout << "Selecione o formato de saída do Grafo:" 
+                    cout << "Selecione o formato:" 
                             << "\n1. Tela" << "\n2. Imagem (PNG)" <<"\n3. Documento (PDF)" << "\n Ou '0' para sair" << endl;
 
                     cin >> metodoSaida;   
@@ -110,7 +125,7 @@ int main(int argc, char*argv[]){
                     switch(metodoSaida){
                         case 1: // TELA
                             cout << "\nAbrindo visualizacao com Graphviz (dot -Tx11)...\n";
-                            std::system("dot -Tx11 rotas.dot");
+                            system("dot -Tx11 rotas.dot");
                             break;
 
                         case 2: // PNG
@@ -129,19 +144,37 @@ int main(int argc, char*argv[]){
                             cout <<"\nComando Inválido! Tente novamente.\n";
                     }
                 } while (metodoSaida !=0);
-            break;
+                break;
             }
 
             case 2: //ENCONTRAR MENOR CAMINHO
-            break;
+                break;
 
             case 3: //DIAMETRO GRAFO
-            break;
+                cout << "Exibindo diametro do grafo de redes: \n"
+                     << g.size() << " Roteadores." << endl;
+                break;
 
             case 4: //ENCONTRAR ROTEADORES CRITICOS
-            break;
-        }
+                cout << "\n=================" << endl;
+                cout << "Exibindo TOP 5 roteadores criticos (Com maior numero de entradas): " << endl;
+                cout << "=================" << endl;
 
+                vector< pair<string, size_t> > rotCriticos; //pair = cada roteador <ip, entradas>
+
+                for (auto ip : ips) {
+                    size_t entradas = g.indegree(ip);
+                    rotCriticos.push_back({ip, entradas});
+                }
+
+                sort(rotCriticos.begin(), rotCriticos.end(), comparaRoteadores); //ordena os rot com mais entradas
+                
+                for (int i = 0; i < 5; i++) {
+                        cout << i + 1 << " Lugar -> Roteador: " << rotCriticos[i].first 
+                             << " | Entradas: " << rotCriticos[i].second << endl;
+                }
+                break;
+        }
     }
     return 0;
 }
