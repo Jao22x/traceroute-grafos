@@ -3,14 +3,13 @@
 #include <iomanip>
 #include <fstream>
 #include <unordered_set>
-#include <algorithm>
 #include <sstream>
 #include <vector>
 
 using namespace std;
 
 bool comparaRoteadores(const pair<string, size_t>& a, const pair<string, size_t>& b) {
-    return a.second > b.second; //retorna true se o primeiro roteador tiver mais entradas que o segundo
+    return a.second > b.second; //retorna true se o primeiro tiver mais entradas que o segundo
 }
 
 int main(int argc, char*argv[]){
@@ -101,7 +100,7 @@ int main(int argc, char*argv[]){
             << "\n0. Sair"
             << "\n==============" << endl;
 
-        if (!(cin >> op)){ //tratamento de erro de entrada
+        if (!(cin >> op) || op < 0 || op > 4){ //tratamento de erro de entrada
             cin.clear();
             cin.ignore(100, '\n');
             cerr << "Erro! Tente novamente" << endl;
@@ -147,19 +146,38 @@ int main(int argc, char*argv[]){
                 break;
             }
 
-            case 2: //ENCONTRAR MENOR CAMINHO
-                break;
+            case 2: { //ENCONTRAR MENOR CAMINHO
+                string origem, destino;
+                cout << "\nEncontrando menor caminho:\nIP de origem: "; cin >> origem;
+                cout << "IP de destino: "; cin >> destino;
+                cout << "==============" << endl;
 
+                vector<string> rota = g.shortest_path(origem, destino);
+
+                if(rota.empty()){ cout << "Não foi encontrado um caminho entre os IP's." << endl; }
+                else if(rota.size() == 1){ cout << "A origem e o destino são o mesmo IP: " << rota.front() << endl; }
+                else{
+                    cout << "Caminho encontrado (" << rota.size() - 1 << " saltos):" << endl;
+                    for (size_t i = 0; i < rota.size(); i++){
+                        cout << rota[i];
+                        if (i < rota.size() - 1){
+                            cout << " -> ";
+                        }
+                    }
+                }   
+                break;
+            }
+            
             case 3: //DIAMETRO GRAFO
                 cout << "Exibindo diametro do grafo de redes: \n"
                      << g.size() << " Roteadores." << endl;
                 break;
 
-            case 4: //ENCONTRAR ROTEADORES CRITICOS
+            case 4: { //ENCONTRAR ROTEADORES CRITICOS
                 cout << "\n=================" << endl;
                 cout << "Exibindo TOP 5 roteadores criticos (Com maior numero de entradas): " << endl;
                 cout << "=================" << endl;
-
+                
                 vector< pair<string, size_t> > rotCriticos; //pair = cada roteador <ip, entradas>
 
                 for (auto ip : ips) {
@@ -174,6 +192,7 @@ int main(int argc, char*argv[]){
                              << " | Entradas: " << rotCriticos[i].second << endl;
                 }
                 break;
+            }
         }
     }
     return 0;
