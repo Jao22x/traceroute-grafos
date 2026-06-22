@@ -18,7 +18,7 @@ Este projeto em C++ realiza a leitura de arquivos de log contendo saltos de rota
 └── traceroute.cpp   (Arquivo principal/Main)
 ````
 
-## Pré-requisitos (Linux)
+## Pré-requisitos
 
 Para compilar e visualizar os grafos corretamente em um ambiente Linux, você precisará do compilador GCC (g++) e do pacote Graphviz (responsável por renderizar os arquivos .dot em imagens e PDFs).
 
@@ -29,7 +29,7 @@ sudo apt update
 sudo apt install g++ graphviz
 ```
 
-##  Como Compilar e Executar no Linux
+##  Como Compilar e Executar
 
 ### 1. Compilação:
 
